@@ -1,4 +1,4 @@
-const TofuSupplyChain = artifacts.require("TofuSupplyChain");
+const SupplyChain = artifacts.require("SupplyChain");
 const BigNumber = require('bignumber.js');
 const Web3Utils = require('web3-utils');
 
@@ -14,7 +14,7 @@ let customer;
 let soySku = 0;
 let tofuSku = 100
 
-// From TofuSupplyChain.sol
+// From SupplyChain.sol
 // enum soyState {Planted, Ripe, Harvested, Ordered, ReadyForShipping, Shipping, Delivered, Used}
 const soyStateEnum = Object.freeze({
     Planted: 0,
@@ -27,7 +27,7 @@ const soyStateEnum = Object.freeze({
     Used: 7
 });
 
-// From TofuSupplyChain.sol
+// From SupplyChain.sol
 // enum tofuState {Produced, Ordered, ReadyForShipping, Shipping, Delivered, OnSale, Sold}
 const tofuStateEnum = Object.freeze({
     Produced: 0,
@@ -46,7 +46,7 @@ const tofuStateEnum = Object.freeze({
 // accounts[3]: retailer
 // accounts[4]: final customer
 
-contract('TofuSupplyChain', (accs) => {
+contract('SupplyChain', (accs) => {
     accounts = accs;
     owner = accounts[0];
 
@@ -58,7 +58,7 @@ contract('TofuSupplyChain', (accs) => {
 })
 
 it('can plant soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "First bean";
@@ -71,7 +71,7 @@ it('can plant soy', async() => {
 
 
 it ('can check soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Bean two";
@@ -82,7 +82,7 @@ it ('can check soy', async() => {
 })
 
 it ('can harvest soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "New bean";
@@ -95,7 +95,7 @@ it ('can harvest soy', async() => {
 })
 
 it ('can order soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Best bean";
@@ -110,7 +110,7 @@ it ('can order soy', async() => {
 })
 
 it('adjusts balances correctly when ordering soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Excelent bean";
@@ -138,7 +138,7 @@ it('adjusts balances correctly when ordering soy', async() => {
 })
 
 it('can ship soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Awesome bean";
@@ -153,7 +153,7 @@ it('can ship soy', async() => {
 })
 
 it('can fetch soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Awesome bean2";
@@ -170,7 +170,7 @@ it('can fetch soy', async() => {
 })
 
 it('can deliver soy', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Next great bean";
@@ -187,7 +187,7 @@ it('can deliver soy', async() => {
 })
 
 it('can make tofu', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let balance = Web3Utils.toWei(".05", "ether");
@@ -216,7 +216,7 @@ it('can make tofu', async() => {
 })
 
 it('can order tofu', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our best bean";
@@ -241,7 +241,7 @@ it('can order tofu', async() => {
 })
 
 it('adjusts balances correctly when ordering tofu', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our best bean";
@@ -278,7 +278,7 @@ it('adjusts balances correctly when ordering tofu', async() => {
 })
 
 it('can ship tofu', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our next bean";
@@ -304,7 +304,7 @@ it('can ship tofu', async() => {
 
 // Testing two functionalities in one test in order to reduce code duplication
 it('can fetch and deliver tofu', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our bright bean";
@@ -336,7 +336,7 @@ it('can fetch and deliver tofu', async() => {
 })
 
 it('can put tofu on sale', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our bright bean";
@@ -368,7 +368,7 @@ it('can put tofu on sale', async() => {
 
 
 it('can buy tofu and adjusts balances correctly', async() => {
-    let instance = await TofuSupplyChain.deployed();
+    let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     let soyPrice = Web3Utils.toWei(".01", "ether");
     let soyName = "Our best bean";

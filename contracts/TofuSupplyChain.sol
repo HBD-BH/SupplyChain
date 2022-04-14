@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 // Define the contract 'TofuSupplyChain'
-contract TofuSupplyChain {
+contract SupplyChain {
     // Holds all functions and structs
 
     address owner;
