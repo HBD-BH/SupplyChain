@@ -284,11 +284,12 @@ contract TofuSupplyChain {
         
     }
 
-    function putTofuOnSale(uint _sku) public 
+    function putTofuOnSale(uint _sku, uint _price) public 
         checkTofuState(_sku, tofuState.Delivered)
         verifyCaller(tofus[_sku].retailer) {
 
         tofus[_sku].state = tofuState.OnSale;
+        tofus[_sku].price = _price;
 
         emit OnSale(_sku);
     }
