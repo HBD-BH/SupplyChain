@@ -148,12 +148,15 @@ contract TofuSupplyChain {
     }
 
     // When checking the soy, the farmer finds out that the soy is ripe (because of their experience, farmers don't check their soy prematurely)
-    function checkSoy(uint _sku) public {
+    function checkSoy(uint _sku) public 
+        verifyCaller(soys[_sku].seller) {
+        
         soys[_sku].state = soyState.Ripe;
     }
 
     // The farmers have to harvest their soy
-    function harvestSoy(uint _sku) public {
+    function harvestSoy(uint _sku) public 
+        verifyCaller(soys[_sku].seller) {
         // Emit event to notify potential buyers
         emit Harvested(_sku);
 
