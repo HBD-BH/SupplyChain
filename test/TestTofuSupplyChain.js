@@ -134,6 +134,54 @@ it('adjusts balances correctly when ordering soy', async() => {
     assert.equal(balanceBuyer_before, value, "Balance of buyer did not decrease correctly");
 })
 
+it('can ship soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 6;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Awesome bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    await instance.shipSoy(soySku, {from: farmer});
+    let mySoy = await instance.getSoy.call(soySku);
+    assert.equal(mySoy.state, soyStateEnum.ReadyForShipping, "Could not ship soy");
+})
+
+it('can fetch soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 7;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Awesome bean2";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    await instance.shipSoy(soySku, {from: farmer});
+    await instance.fetchSoy(soySku, {from: distributor});
+    let mySoy = await instance.getSoy.call(soySku);
+    assert.equal(mySoy.state, soyStateEnum.Shipping, "Could not fetch soy");
+    assert.equal(mySoy.distributor, distributor, "Distributor not assignd properly");
+})
+
+it('can deliver soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 8;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Next great bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    await instance.shipSoy(soySku, {from: farmer});
+    await instance.fetchSoy(soySku, {from: distributor});
+    await instance.deliverSoy(soySku, {from: distributor});
+    let mySoy = await instance.getSoy.call(soySku);
+    assert.equal(mySoy.state, soyStateEnum.Delivered, "Could not deliver soy");
+})
 
 
 
