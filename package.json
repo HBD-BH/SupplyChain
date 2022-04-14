@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@truffle/hdwallet-provider": "^2.0.6",
-    "bignumber.js": "^9.0.2"
+    "bignumber.js": "^9.0.2",
+    "web3-eth": "^1.7.3",
+    "web3-utils": "^1.7.3"
   }
 }
