@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-// Define the contract 'Base'
-contract Base {
+// Define the contract 'TofuSupplyChain'
+contract TofuSupplyChain {
     // Holds all functions and structs
 
     address owner;
@@ -54,6 +54,20 @@ contract Base {
         owner = msg.sender;
         skuCountSoy = 0;
         skuCountTofu = 100;
+    }
+
+    // Get soy info
+    function getSoy(uint _soySku) public view returns (Soy memory) {
+        Soy memory queriedSoy = soys[_soySku];
+        require(keccak256(bytes(queriedSoy.name)) != keccak256(bytes("")), "Queried soy info for nonexistent SKU"); // Thanks to Greg Mikeska: https://ethereum.stackexchange.com/a/11754
+        return queriedSoy;
+    }
+
+    // Get tofu info
+    function getTofu(uint _tofuSku) public view returns (Tofu memory) {
+        Tofu memory queriedTofu = tofus[_tofuSku];
+        require(keccak256(bytes(queriedTofu.name)) != keccak256(bytes("")), "Queried tofu info for nonexistent SKU"); // Thanks to Greg Mikeska: https://ethereum.stackexchange.com/a/11754
+        return queriedTofu;
     }
 
 
