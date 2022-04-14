@@ -183,5 +183,33 @@ it('can deliver soy', async() => {
     assert.equal(mySoy.state, soyStateEnum.Delivered, "Could not deliver soy");
 })
 
+it('can make tofu', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 9;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let tofuSku = 101;
+    let tofuName = "Our best tofu";
+    let tofuPrice = Web3Utils.toWei(".02", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Our best bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    await instance.shipSoy(soySku, {from: farmer});
+    await instance.fetchSoy(soySku, {from: distributor});
+    await instance.deliverSoy(soySku, {from: distributor});
+    await instance.makeTofu(tofuName, soySku, tofuPrice, {from: tofuCompany});
+
+    let mySoy = await instance.getSoy.call(soySku);
+    let myTofu = await instance.getTofu.call(tofuSku);
+    assert.equal(mySoy.state, soyStateEnum.Used, "Could not use soy");
+    assert.equal(mySoy.toTofuSku, tofuSku, "Could not link soy to yielded tofu sku");
+    assert.equal(myTofu.state, tofuStateEnum.Produced, "Could not produce tofu");
+    assert.equal(myTofu.price, tofuPrice, "Could not add price information for tofu");
+    assert.equal(myTofu.name, tofuName, "Could not add tofu name");
+    assert.equal(myTofu.producer, tofuCompany, "Could not add tofu producer");
+    assert.equal(myTofu.fromSoySku, soySku, "Could not link tofu to original soy sku");
+})
 
 
