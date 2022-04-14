@@ -1,5 +1,7 @@
 const TofuSupplyChain = artifacts.require("TofuSupplyChain");
 const BigNumber = require('bignumber.js');
+const Web3Utils = require('web3-utils');
+
 
 let accounts;
 let owner;
@@ -8,13 +10,6 @@ let tofuCompany;
 let distributor;
 let retailer;
 let customer;
-
-// For these tests, the following roles apply:
-// accounts[0]: owner and farmer
-// accounts[1]: tofu company
-// accounts[2]: distributor
-// accounts[3]: retailer
-// accounts[4]: final customer
 
 // From TofuSupplyChain.sol
 // enum soyState {Planted, Ripe, Harvested, Ordered, ReadyForShipping, Shipping, Delivered, Used}
@@ -41,6 +36,13 @@ const tofuStateEnum = Object.freeze({
     Sold: 6
 });
 
+// For these tests, the following roles apply:
+// accounts[0]: owner and farmer
+// accounts[1]: tofu company
+// accounts[2]: distributor
+// accounts[3]: retailer
+// accounts[4]: final customer
+
 contract('TofuSupplyChain', (accs) => {
     accounts = accs;
     owner = accounts[0];
@@ -53,22 +55,84 @@ contract('TofuSupplyChain', (accs) => {
 })
 
 it('can plant soy', async() => {
-    let soySku = 1;
     let instance = await TofuSupplyChain.deployed();
-    await instance.plantSoy('New bean', soySku, {from: accounts[0]})
+    let soySku = 1;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let soyName = "First bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
     let mySoy = await instance.getSoy.call(soySku);
-    assert.equal(mySoy.name, 'New bean', "Soy not planted properly")
+    assert.equal(mySoy.name, soyName, "Soy not planted properly");
+    assert.equal(mySoy.price, soyPrice, "Soy price not assigned correctly");
+    assert.equal(mySoy.seller, farmer, "Soy farmer not attributed correctly");
 })
+
 
 it ('can check soy', async() => {
-    let soySku = 2;
     let instance = await TofuSupplyChain.deployed();
-    await instance.plantSoy('Bean 2', soySku, {from: accounts[0]})
-    await instance.checkSoy(soySku)
+    let soySku = 2;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let soyName = "Bean two";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
     let mySoy = await instance.getSoy.call(soySku);
-    assert.equal(mySoy.state, soyStateEnum.Ripe, "Soy has not riped correctly")
+    assert.equal(mySoy.state, soyStateEnum.Ripe, "Soy has not riped correctly");
 })
 
+it ('can harvest soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 3;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let soyName = "New bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    let mySoy = await instance.getSoy.call(soySku);
+    assert.equal(mySoy.state, soyStateEnum.Harvested, "Could not harvest soy");
+
+})
+
+it ('can order soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 4;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Best bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    let mySoy = await instance.getSoy.call(soySku);
+    assert.equal(mySoy.state, soyStateEnum.Ordered, "Could not order soy");
+    assert.equal(mySoy.buyer, tofuCompany, "Soy buyer not assigned properly");
+})
+
+it('adjusts balances correctly when ordering soy', async() => {
+    let instance = await TofuSupplyChain.deployed();
+    let soySku = 5;
+    let soyPrice = Web3Utils.toWei(".01", "ether");
+    let balance = Web3Utils.toWei(".05", "ether");
+    let soyName = "Excelent bean";
+    await instance.plantSoy(soyName, soyPrice, {from: farmer});
+    await instance.checkSoy(soySku, {from: farmer});
+    await instance.harvestSoy(soySku, {from: farmer});
+    let balanceBuyer_before = await web3.eth.getBalance(tofuCompany);
+    let balanceSeller_before = await web3.eth.getBalance(farmer);
+    let receipt = await instance.orderSoy(soySku, {from: tofuCompany, value: balance});
+    let balanceBuyer_after = await web3.eth.getBalance(tofuCompany);
+    let balanceSeller_after = await web3.eth.getBalance(farmer);
+
+    // Calculating amount paid for gas: adapted from Ismael: https://ethereum.stackexchange.com/a/42175
+    const gasUsed = BigNumber(receipt.receipt.gasUsed);
+    const tx = await web3.eth.getTransaction(receipt.tx);
+    let gasPrice = BigNumber(tx.gasPrice);
+    let gasFee = gasPrice * gasUsed;
+
+
+    let value = BigNumber(balanceBuyer_after).plus(gasFee).plus(BigNumber(soyPrice));
+
+    assert.equal(balanceSeller_after, Number(BigNumber(balanceSeller_before).plus(BigNumber(soyPrice))), "Balance of seller did not increase correctly");
+    assert.equal(balanceBuyer_before, value, "Balance of buyer did not decrease correctly");
+})
 
 
 
