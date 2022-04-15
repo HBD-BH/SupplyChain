@@ -46,6 +46,20 @@ const tofuStateEnum = Object.freeze({
 // accounts[3]: retailer
 // accounts[4]: final customer
 
+
+// Variables to test the whole process end-to-end without copy & pasting too much with each test
+let soyName = "First bean";
+let soyPrice = Web3Utils.toWei(".01", "ether");
+let soyUpc = 1234;
+let soyLat = "49.434831594";
+let soyLong = "0.271332248";
+let tofuName = "Our best tofu";
+let tofuUpc = 4321;
+let tofuLat = "48.8583";
+let tofuLong = "2.2945";
+let tofuPrice = Web3Utils.toWei(".02", "ether");
+let tofuRetailPrice = Web3Utils.toWei(".04", "ether");
+
 contract('SupplyChain', (accs) => {
     accounts = accs;
     owner = accounts[0];
@@ -60,11 +74,6 @@ contract('SupplyChain', (accs) => {
 it('can plant soy', async() => {
     let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "First bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
     await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.name, soyName, "Soy not planted properly");
@@ -73,16 +82,8 @@ it('can plant soy', async() => {
 })
 
 
-/*
 it ('can check soy', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Bean two";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
     await instance.checkSoy(soyUpc, {from: farmer});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.state, soyStateEnum.Ripe, "Soy has not riped correctly");
@@ -90,50 +91,15 @@ it ('can check soy', async() => {
 
 it ('can harvest soy', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "New bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
     await instance.harvestSoy(soyUpc, {from: farmer});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.state, soyStateEnum.Harvested, "Could not harvest soy");
 
 })
 
-it ('can order soy', async() => {
+it ('can order soy and adjusts balances correctly', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Best bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
     let balance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
-    let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Ordered, "Could not order soy");
-    assert.equal(mySoy.buyer, tofuCompany, "Soy buyer not assigned properly");
-})
-
-it('adjusts balances correctly when ordering soy', async() => {
-    let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Excelent bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    let balance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
     let balanceBuyer_before = await web3.eth.getBalance(tofuCompany);
     let balanceSeller_before = await web3.eth.getBalance(farmer);
     let receipt = await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
@@ -151,21 +117,14 @@ it('adjusts balances correctly when ordering soy', async() => {
 
     assert.equal(balanceSeller_after, Number(BigNumber(balanceSeller_before).plus(BigNumber(soyPrice))), "Balance of seller did not increase correctly");
     assert.equal(balanceBuyer_before, value, "Balance of buyer did not decrease correctly");
+
+    let mySoy = await instance.getSoy.call(soyUpc);
+    assert.equal(mySoy.state, soyStateEnum.Ordered, "Could not order soy");
+    assert.equal(mySoy.buyer, tofuCompany, "Soy buyer not assigned properly");
 })
 
 it('can ship soy', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Awesome bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    let balance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
     await instance.shipSoy(soyUpc, {from: farmer});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.state, soyStateEnum.ReadyForShipping, "Could not ship soy");
@@ -173,18 +132,6 @@ it('can ship soy', async() => {
 
 it('can fetch soy', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Awesome bean2";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    let balance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
-    await instance.shipSoy(soyUpc, {from: farmer});
     await instance.fetchSoy(soyUpc, {from: distributor});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.state, soyStateEnum.Shipping, "Could not fetch soy");
@@ -193,19 +140,6 @@ it('can fetch soy', async() => {
 
 it('can deliver soy', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Next great bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    let balance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
     await instance.deliverSoy(soyUpc, {from: distributor});
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy.state, soyStateEnum.Delivered, "Could not deliver soy");
@@ -213,26 +147,6 @@ it('can deliver soy', async() => {
 
 it('can make tofu', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let balance = Web3Utils.toWei(".05", "ether");
-    let soyName = "Our best bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our best tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: balance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
     await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
 
     let mySoy = await instance.getSoy.call(soyUpc);
@@ -248,59 +162,7 @@ it('can make tofu', async() => {
 
 it('can order tofu', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our best bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our new tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
     let tofuBalance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
-    await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
-
-    let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.Ordered, "Could not order tofu");
-    assert.equal(myTofu.retailer, retailer, "Could not assign retailer properly");
-})
-
-it('adjusts balances correctly when ordering tofu', async() => {
-    let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our best bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our new tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
-    let tofuBalance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
     let balanceRetailer_before = await web3.eth.getBalance(retailer);
     let balanceProducer_before = await web3.eth.getBalance(tofuCompany);
     let receipt = await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
@@ -318,66 +180,23 @@ it('adjusts balances correctly when ordering tofu', async() => {
 
     assert.equal(balanceProducer_after, Number(BigNumber(balanceProducer_before).plus(BigNumber(tofuPrice))), "Balance of producer did not increase correctly");
     assert.equal(balanceRetailer_before, value, "Balance of retailer did not decrease correctly");
+
+    let myTofu = await instance.getTofu.call(tofuUpc);
+    assert.equal(myTofu.state, tofuStateEnum.Ordered, "Could not order tofu");
+    assert.equal(myTofu.retailer, retailer, "Could not assign retailer properly");
 })
 
 it('can ship tofu', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our next bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our next tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
-    let tofuBalance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
-    await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
     await instance.shipTofu(tofuUpc, {from: tofuCompany});
 
     let myTofu = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu.state, tofuStateEnum.ReadyForShipping, "Could not ship tofu");
 })
 
-// Testing two functionalities in one test in order to reduce code duplication
+// Testing two functionalities in one test in order to reduce complexity
 it('can fetch and deliver tofu', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our bright bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our delicious tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
-    let tofuBalance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
-    await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
-    await instance.shipTofu(tofuUpc, {from: tofuCompany});
     await instance.fetchTofu(tofuUpc, {from: distributor});
 
     let myTofu = await instance.getTofu.call(tofuUpc);
@@ -392,33 +211,6 @@ it('can fetch and deliver tofu', async() => {
 
 it('can put tofu on sale', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our bright bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our delicious tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
-    let tofuBalance = Web3Utils.toWei(".05", "ether");
-    let tofuRetailPrice = Web3Utils.toWei(".04", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
-    await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
-    await instance.shipTofu(tofuUpc, {from: tofuCompany});
-    await instance.fetchTofu(tofuUpc, {from: distributor});
-    await instance.deliverTofu(tofuUpc, {from: distributor});
     await instance.putTofuOnSale(tofuUpc, tofuRetailPrice, {from:retailer});
 
     let myTofu = await instance.getTofu.call(tofuUpc);
@@ -430,35 +222,8 @@ it('can put tofu on sale', async() => {
 
 it('can buy tofu and adjusts balances correctly', async() => {
     let instance = await SupplyChain.deployed();
-    soySku = soySku + 1;
-    let soyPrice = Web3Utils.toWei(".01", "ether");
-    let soyName = "Our best bean";
-    let soyUpc = 1234;
-    let soyLat = "49.434831594";
-    let soyLong = "0.271332248";
-    tofuSku = tofuSku + 1;
-    let tofuName = "Our new tofu";
-    let tofuUpc = 4321;
-    let tofuLat = "48.8583";
-    let tofuLong = "2.2945";
-    let tofuPrice = Web3Utils.toWei(".02", "ether");
-    let tofuRetailPrice = Web3Utils.toWei(".04", "ether");
-    let soyBalance = Web3Utils.toWei(".05", "ether");
-    let tofuBalance = Web3Utils.toWei(".05", "ether");
     let tofuRetailBalance = Web3Utils.toWei(".05", "ether");
-    await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
-    await instance.checkSoy(soyUpc, {from: farmer});
-    await instance.harvestSoy(soyUpc, {from: farmer});
-    await instance.orderSoy(soyUpc, {from: tofuCompany, value: soyBalance});
-    await instance.shipSoy(soyUpc, {from: farmer});
-    await instance.fetchSoy(soyUpc, {from: distributor});
-    await instance.deliverSoy(soyUpc, {from: distributor});
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
-    await instance.orderTofu(tofuUpc, {from: retailer, value: tofuBalance});
-    await instance.shipTofu(tofuUpc, {from: tofuCompany});
-    await instance.fetchTofu(tofuUpc, {from: distributor});
-    await instance.deliverTofu(tofuUpc, {from: distributor});
-    await instance.putTofuOnSale(tofuUpc, tofuRetailPrice, {from:retailer});
+
     let balanceRetailer_before = await web3.eth.getBalance(retailer);
     let balanceCustomer_before = await web3.eth.getBalance(customer);
     let receipt = await instance.buyTofu(tofuUpc, {from: customer, value: tofuRetailBalance});
@@ -481,4 +246,3 @@ it('can buy tofu and adjusts balances correctly', async() => {
     assert.equal(myTofu.state, tofuStateEnum.Sold, "Could not sell tofu");
     assert.equal(myTofu.buyer, customer, "Could not hand over tofu to customer");
 })
-*/
