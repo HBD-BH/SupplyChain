@@ -75,25 +75,31 @@ it('can plant soy', async() => {
     let instance = await SupplyChain.deployed();
     soySku = soySku + 1;
     await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.name, soyName, "Soy not planted properly");
-    assert.equal(mySoy.price, soyPrice, "Soy price not assigned correctly");
-    assert.equal(mySoy.farmer, farmer, "Soy farmer not attributed correctly");
+    assert.equal(mySoy[0], soyName, "Soy not planted properly");
+    assert.equal(mySoy[2], soyPrice, "Soy price not assigned correctly");
+    assert.equal(mySoy[4], farmer, "Soy farmer not attributed correctly");
 })
 
 
 it ('can check soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.checkSoy(soyUpc, {from: farmer});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Ripe, "Soy has not riped correctly");
+    assert.equal(mySoy[3], soyStateEnum.Ripe, "Soy has not riped correctly");
 })
 
 it ('can harvest soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.harvestSoy(soyUpc, {from: farmer});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Harvested, "Could not harvest soy");
+    assert.equal(mySoy[3], soyStateEnum.Harvested, "Could not harvest soy");
 
 })
 
@@ -118,41 +124,51 @@ it ('can order soy and adjusts balances correctly', async() => {
     assert.equal(balanceSeller_after, Number(BigNumber(balanceSeller_before).plus(BigNumber(soyPrice))), "Balance of seller did not increase correctly");
     assert.equal(balanceBuyer_before, value, "Balance of buyer did not decrease correctly");
 
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Ordered, "Could not order soy");
-    assert.equal(mySoy.buyer, tofuCompany, "Soy buyer not assigned properly");
+    assert.equal(mySoy[3], soyStateEnum.Ordered, "Could not order soy");
+    assert.equal(mySoy[8], tofuCompany, "Soy buyer not assigned properly");
 })
 
 it('can ship soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.shipSoy(soyUpc, {from: farmer});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.ReadyForShipping, "Could not ship soy");
+    assert.equal(mySoy[3], soyStateEnum.ReadyForShipping, "Could not ship soy");
 })
 
 it('can fetch soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.fetchSoy(soyUpc, {from: distributor});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Shipping, "Could not fetch soy");
-    assert.equal(mySoy.distributor, distributor, "Distributor not assignd properly");
+    assert.equal(mySoy[3], soyStateEnum.Shipping, "Could not fetch soy");
+    assert.equal(mySoy[7], distributor, "Distributor not assignd properly");
 })
 
 it('can deliver soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.deliverSoy(soyUpc, {from: distributor});
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
-    assert.equal(mySoy.state, soyStateEnum.Delivered, "Could not deliver soy");
+    assert.equal(mySoy[3], soyStateEnum.Delivered, "Could not deliver soy");
 })
 
 it('can make tofu', async() => {
     let instance = await SupplyChain.deployed();
     await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
 
+    // getSoy returns  0     1    2      3      4       5          6           7            8      9
+    // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(mySoy.state, soyStateEnum.Used, "Could not use soy");
-    assert.equal(mySoy.toTofuUpc, tofuUpc, "Could not link soy to yielded tofu upc");
+    assert.equal(mySoy[3], soyStateEnum.Used, "Could not use soy");
+    assert.equal(mySoy[9], tofuUpc, "Could not link soy to yielded tofu upc");
     assert.equal(myTofu.state, tofuStateEnum.Produced, "Could not produce tofu");
     assert.equal(myTofu.price, tofuPrice, "Could not add price information for tofu");
     assert.equal(myTofu.name, tofuName, "Could not add tofu name");

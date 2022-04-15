@@ -48,8 +48,6 @@ contract SupplyChain {
     mapping (uint => Soy) soys;
     mapping (uint => Tofu) tofus;
 
-    // TODO: Add item history mapping from UTC to array of transaction hashes
-
     // Events
     event Harvested(uint upc);
     event Produced(uint upc);
@@ -65,10 +63,32 @@ contract SupplyChain {
     }
 
     // Get soy info TODO replace with returning tuple of soy infos
-    function getSoy(uint _soyUpc) public view returns (Soy memory) {
+    function getSoy(uint _soyUpc) public view returns (
+        string memory  name,
+        uint sku,
+        uint  price,
+        soyState  state,
+        address  farmer,       
+        string memory originLatitude,
+        string memory originLongitude,
+        address distributor,
+        address  buyer,         
+        uint toTofuUpc
+    ) {
         Soy memory queriedSoy = soys[_soyUpc];
         require(keccak256(bytes(queriedSoy.name)) != keccak256(bytes("")), "Queried soy info for nonexistent UPC"); // Thanks to Greg Mikeska: https://ethereum.stackexchange.com/a/11754
-        return queriedSoy;
+        return (
+            name = queriedSoy.name,
+            sku = queriedSoy.sku,
+            price = queriedSoy.price,
+            state = queriedSoy.state,
+            farmer = queriedSoy.farmer,
+            originLatitude = queriedSoy.originLatitude,
+            originLongitude = queriedSoy.originLongitude,
+            distributor = queriedSoy.distributor,
+            buyer = queriedSoy.buyer,
+            toTofuUpc = queriedSoy.toTofuUpc
+        );
     }
 
     // Get tofu info TODO replace with returning tuple of tofu infos
