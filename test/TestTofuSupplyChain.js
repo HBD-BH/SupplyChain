@@ -276,3 +276,4 @@ it('can buy tofu and adjusts balances correctly', async() => {
     assert.equal(myTofu[3], tofuStateEnum.Sold, "Could not sell tofu");
     assert.equal(myTofu[9], customer, "Could not hand over tofu to customer");
 })
+

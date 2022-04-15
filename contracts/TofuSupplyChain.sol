@@ -62,7 +62,7 @@ contract SupplyChain {
         skuCountTofu = 100;
     }
 
-    // Get soy info TODO replace with returning tuple of soy infos
+    // Get soy info 
     function getSoy(uint _soyUpc) public view returns (
         string memory  name,
         uint sku,
@@ -91,7 +91,7 @@ contract SupplyChain {
         );
     }
 
-    // Get tofu info TODO replace with returning tuple of tofu infos
+    // Get tofu info 
     function getTofu(uint _tofuUpc) public view returns (
             string memory name,
             uint sku,
