@@ -1,13 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
 // Define the contract 'SupplyChain'
-contract SupplyChain {
+contract SupplyChain is AccessControl {
     // Holds all functions and structs
 
-    address owner;
+    //address owner;
     uint skuCountSoy;
     uint skuCountTofu;
+
+    // Roles within the tofu supply chain
+    bytes32 public constant FARMER_ROLE = keccak256("FARMER_ROLE");
+    bytes32 public constant TOFUPRODUCER_ROLE = keccak256("TOFUPRODUCER_ROLE");
+    bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
+    bytes32 public constant RETAILER_ROLE = keccak256("RETAILER_ROLE");
+    bytes32 public constant CUSTOMER_ROLE = keccak256("CUSTOMER_ROLE");
 
     // Enums for soy/tofu states
     enum soyState {Planted, Ripe, Harvested, Ordered, ReadyForShipping, Shipping, Delivered, Used}
@@ -57,7 +66,8 @@ contract SupplyChain {
     event Sold(uint upc);
 
     constructor() payable {
-        owner = msg.sender;
+        //owner = msg.sender;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         skuCountSoy = 0;
         skuCountTofu = 100;
     }
@@ -124,10 +134,12 @@ contract SupplyChain {
 
 
     // See if msg.sender == owner of the contract
+    /*
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can call this function");
         _;
     }
+    */
 
     // Verify the Caller
     modifier verifyCaller (address _address) {
