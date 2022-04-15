@@ -92,10 +92,34 @@ contract SupplyChain {
     }
 
     // Get tofu info TODO replace with returning tuple of tofu infos
-    function getTofu(uint _tofuUpc) public view returns (Tofu memory) {
+    function getTofu(uint _tofuUpc) public view returns (
+            string memory name,
+            uint sku,
+            uint  price,
+            tofuState  state,
+            address  producer,      
+            string memory originLatitude,
+            string memory originLongitude,
+            address  distributor,
+            address retailer,
+            address buyer,          
+            uint fromSoyUpc
+        ) {
         Tofu memory queriedTofu = tofus[_tofuUpc];
         require(keccak256(bytes(queriedTofu.name)) != keccak256(bytes("")), "Queried tofu info for nonexistent UPC"); // Thanks to Greg Mikeska: https://ethereum.stackexchange.com/a/11754
-        return queriedTofu;
+        return (
+            name = queriedTofu.name,
+            sku = queriedTofu.sku,
+            price = queriedTofu.price,
+            state = queriedTofu.state,
+            producer = queriedTofu.producer,
+            originLatitude = queriedTofu.originLatitude,
+            originLongitude = queriedTofu.originLongitude,
+            distributor = queriedTofu.distributor,
+            retailer = queriedTofu.retailer,
+            buyer = queriedTofu.buyer,
+            fromSoyUpc = queriedTofu.fromSoyUpc
+        );
     }
 
 

@@ -166,14 +166,16 @@ it('can make tofu', async() => {
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
     assert.equal(mySoy[3], soyStateEnum.Used, "Could not use soy");
     assert.equal(mySoy[9], tofuUpc, "Could not link soy to yielded tofu upc");
-    assert.equal(myTofu.state, tofuStateEnum.Produced, "Could not produce tofu");
-    assert.equal(myTofu.price, tofuPrice, "Could not add price information for tofu");
-    assert.equal(myTofu.name, tofuName, "Could not add tofu name");
-    assert.equal(myTofu.producer, tofuCompany, "Could not add tofu producer");
-    assert.equal(myTofu.fromSoyUpc, soyUpc, "Could not link tofu to original soy upc");
+    assert.equal(myTofu[3], tofuStateEnum.Produced, "Could not produce tofu");
+    assert.equal(myTofu[2], tofuPrice, "Could not add price information for tofu");
+    assert.equal(myTofu[0], tofuName, "Could not add tofu name");
+    assert.equal(myTofu[4], tofuCompany, "Could not add tofu producer");
+    assert.equal(myTofu[10], soyUpc, "Could not link tofu to original soy upc");
 })
 
 it('can order tofu', async() => {
@@ -197,17 +199,21 @@ it('can order tofu', async() => {
     assert.equal(balanceProducer_after, Number(BigNumber(balanceProducer_before).plus(BigNumber(tofuPrice))), "Balance of producer did not increase correctly");
     assert.equal(balanceRetailer_before, value, "Balance of retailer did not decrease correctly");
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.Ordered, "Could not order tofu");
-    assert.equal(myTofu.retailer, retailer, "Could not assign retailer properly");
+    assert.equal(myTofu[3], tofuStateEnum.Ordered, "Could not order tofu");
+    assert.equal(myTofu[8], retailer, "Could not assign retailer properly");
 })
 
 it('can ship tofu', async() => {
     let instance = await SupplyChain.deployed();
     await instance.shipTofu(tofuUpc, {from: tofuCompany});
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.ReadyForShipping, "Could not ship tofu");
+    assert.equal(myTofu[3], tofuStateEnum.ReadyForShipping, "Could not ship tofu");
 })
 
 // Testing two functionalities in one test in order to reduce complexity
@@ -215,12 +221,16 @@ it('can fetch and deliver tofu', async() => {
     let instance = await SupplyChain.deployed();
     await instance.fetchTofu(tofuUpc, {from: distributor});
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.Shipping, "Could not fetch tofu");
-    assert.equal(myTofu.distributor, distributor, "Could not assign distributor correctly");
+    assert.equal(myTofu[3], tofuStateEnum.Shipping, "Could not fetch tofu");
+    assert.equal(myTofu[7], distributor, "Could not assign distributor correctly");
 
     await instance.deliverTofu(tofuUpc, {from: distributor});
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu2 = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu2.state, tofuStateEnum.Delivered, "Could not deliver tofu");
 })
@@ -229,9 +239,11 @@ it('can put tofu on sale', async() => {
     let instance = await SupplyChain.deployed();
     await instance.putTofuOnSale(tofuUpc, tofuRetailPrice, {from:retailer});
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.OnSale, "Could not put tofu on sale");
-    assert.equal(myTofu.price, tofuRetailPrice, "Could not assign retail price to tofu");
+    assert.equal(myTofu[3], tofuStateEnum.OnSale, "Could not put tofu on sale");
+    assert.equal(myTofu[2], tofuRetailPrice, "Could not assign retail price to tofu");
 })
 
 
@@ -258,7 +270,9 @@ it('can buy tofu and adjusts balances correctly', async() => {
     assert.equal(balanceRetailer_after, Number(BigNumber(balanceRetailer_before).plus(BigNumber(tofuRetailPrice))), "Balance of retailer did not increase correctly");
     assert.equal(balanceCustomer_before, value, "Balance of customer did not decrease correctly");
 
+    // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
+    // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
-    assert.equal(myTofu.state, tofuStateEnum.Sold, "Could not sell tofu");
-    assert.equal(myTofu.buyer, customer, "Could not hand over tofu to customer");
+    assert.equal(myTofu[3], tofuStateEnum.Sold, "Could not sell tofu");
+    assert.equal(myTofu[9], customer, "Could not hand over tofu to customer");
 })
