@@ -193,12 +193,69 @@ contract SupplyChain is AccessControl {
         return payable(x); // According to k06a's answer: https://ethereum.stackexchange.com/a/65694
     }
 
+    // Access Control function
+    function addRole(string memory _role, address _newMember) public {
+        if (keccak256(bytes(_role)) == keccak256("FARMER")) {
+            grantRole(FARMER_ROLE, _newMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("TOFUPRODUCER")) {
+            grantRole(TOFUPRODUCER_ROLE, _newMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("DISTRIBUTOR")) {
+            grantRole(DISTRIBUTOR_ROLE, _newMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("RETAILER")) {
+            grantRole(RETAILER_ROLE, _newMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("CUSTOMER")) {
+            grantRole(CUSTOMER_ROLE, _newMember);
+        } 
+    }
+
+    function revokeRole(string memory _role, address _oldMember) public {
+        if (keccak256(bytes(_role)) == keccak256("FARMER")) {
+            revokeRole(FARMER_ROLE, _oldMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("TOFUPRODUCER")) {
+            revokeRole(TOFUPRODUCER_ROLE, _oldMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("DISTRIBUTOR")) {
+            revokeRole(DISTRIBUTOR_ROLE, _oldMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("RETAILER")) {
+            revokeRole(RETAILER_ROLE, _oldMember);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("CUSTOMER")) {
+            revokeRole(CUSTOMER_ROLE, _oldMember);
+        } 
+    }
+
+    function isRole(string memory _role, address _member) public view returns (bool bHasRole) {
+        if (keccak256(bytes(_role)) == keccak256("FARMER")) {
+            bHasRole = hasRole(FARMER_ROLE, _member);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("TOFUPRODUCER")) {
+            bHasRole = hasRole(TOFUPRODUCER_ROLE, _member);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("DISTRIBUTOR")) {
+            bHasRole = hasRole(DISTRIBUTOR_ROLE, _member);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("RETAILER")) {
+            bHasRole = hasRole(RETAILER_ROLE, _member);
+        } 
+        if (keccak256(bytes(_role)) == keccak256("CUSTOMER")) {
+            bHasRole = hasRole(CUSTOMER_ROLE, _member);
+        } 
+    }
+
+
     function plantSoy(
             string memory _name,
             uint _upc,
             uint _price,
             string memory _lat,
-            string memory _long) public {
+            string memory _long) public 
+            onlyRole(FARMER_ROLE) {
         // Increment sku
         skuCountSoy = skuCountSoy + 1;
 

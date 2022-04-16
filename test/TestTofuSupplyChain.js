@@ -4,7 +4,7 @@ const Web3Utils = require('web3-utils');
 
 
 let accounts;
-let owner;
+let owner_admin;
 let farmer;
 let tofuCompany;
 let distributor;
@@ -40,11 +40,12 @@ const tofuStateEnum = Object.freeze({
 });
 
 // For these tests, the following roles apply:
-// accounts[0]: owner and farmer
-// accounts[1]: tofu company
-// accounts[2]: distributor
-// accounts[3]: retailer
-// accounts[4]: final customer
+// accounts[0]: owner/admin
+// accounts[1]: farmer
+// accounts[2]: tofu company
+// accounts[3]: distributor
+// accounts[4]: retailer
+// accounts[5]: final customer
 
 
 // Variables to test the whole process end-to-end without copy & pasting too much with each test
@@ -62,17 +63,27 @@ let tofuRetailPrice = Web3Utils.toWei(".04", "ether");
 
 contract('SupplyChain', (accs) => {
     accounts = accs;
-    owner = accounts[0];
+    owner_admin = accounts[0];
 
-    farmer = accounts[0];
-    tofuCompany = accounts[1];
-    distributor = accounts[2];
-    retailer = accounts[3];
-    customer = accounts[4];
-})
+    farmer = accounts[1];
+    tofuCompany = accounts[2];
+    distributor = accounts[3];
+    retailer = accounts[4];
+    customer = accounts[5];
 
 it('can plant soy', async() => {
     let instance = await SupplyChain.deployed();
+
+    // Grant farmer role
+    //console.log(farmer)
+    //console.log(instance.FARMER_ROLE)
+    //console.log(owner_admin)
+    let role_b = await instance.isRole("FARMER", farmer);
+    await instance.addRole("FARMER", farmer, {from: owner_admin});
+    let role_a = await instance.isRole("FARMER", farmer);
+    console.log(`Role before: ${role_b}, Role after: ${role_a}`);
+
+
     soySku = soySku + 1;
     await instance.plantSoy(soyName, soyUpc, soyPrice, soyLat, soyLong, {from: farmer});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
@@ -277,3 +288,5 @@ it('can buy tofu and adjusts balances correctly', async() => {
     assert.equal(myTofu[9], customer, "Could not hand over tofu to customer");
 })
 
+
+});
