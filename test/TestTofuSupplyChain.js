@@ -144,7 +144,6 @@ it ('can order soy and adjusts balances correctly', async() => {
     let gasPrice = BigNumber(tx.gasPrice);
     let gasFee = gasPrice * gasUsed;
 
-
     let value = BigNumber(balanceBuyer_after).plus(gasFee).plus(BigNumber(soyPrice));
 
     assert.equal(balanceSeller_after, Number(BigNumber(balanceSeller_before).plus(BigNumber(soyPrice))), "Balance of seller did not increase correctly");

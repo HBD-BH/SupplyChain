@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tofu Supply Chain DAPP</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'> 
+  </head>
+  <style>
+    input {
+      display: block;
+      margin-bottom: 12px;
+    }
+  </style>
+  <body>
+      <h1>Tofu Supply Chain DAPP</h1>
+      <hr />
+      <h2>Input fields</h2>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 40px;">
+                  <td style="width: 14.2857%; height: 22px;"><label for="soyName">Soy product name</label><input id="soyName" type="text" /></td>
+                  <td style="width: 14.2857%; height: 22px;"><label for="soyUpc">Soy UPC</label><input id="soyUpc" type="text" /></td>
+                  <td style="width: 14.2857%; height: 22px;"><label for="soyLat">Soy farm latitude</label><input id="soyLat" type="text" /></td>
+                  <td style="width: 14.2857%; height: 22px;"><label for="soyLong">Soy farm longitude</label><input id="soyLong" type="text" /></td>
+                  <td style="width: 14.2857%; height: 22px;"><label for="soyPrice">Soy price</label><input id="soyPrice" type="text" /></td>
+                  <td>&nbsp;</td>
+              </tr>
+              <tr style="height: 10px;">
+                  <td>&nbsp;</td>
+              </tr>
+              <tr style="height: 20px;">
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuName">Tofu product name</label><input id="tofuName" type="text" /></td>
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuUpc">Tofu UPC</label><input id="tofuUpc" type="text" /></td>
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuLat">Tofu producer latitude</label><input id="tofuLat" type="text" /></td>
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuLong">Tofu producer longitude</label><input id="tofuLong" type="text" /></td>
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuPrice">Tofu Price</label><input id="tofuPrice" type="text" /></td>
+                  <td style="width: 14.2857%; height: 30px;"><label for="tofuSoyUpc">Originating soy Upc</label><input id="tofuSoyUpc" type="text" /></td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Role actions</h2>
+      <p><label for="id">Role (must be FARMER, TOFUPRODUCER, RETAILER, DISTRIBUTOR, or CUSTOMER): </label><input id="id" type="text" /></p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnAddRole">Add role</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnRemoveRole">Remove role</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Soy farmer actions</h2>
+      <p>(Use input fields above to control behavior.)</p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnPlantSoy">Plant soy</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnCheckSoy">Check your soy, maybe it's ready for harvesting?</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnHarvestSoy">Harvest your soy once it's ripe!</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnShipSoy">Ship your soy to the tofu producer once it's ordered</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Tofu producer actions</h2>
+      <p>(Use input fields above to control behavior.)</p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnOrderSoy">Order new soy</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnMakeTofu">Make tofu (has your soy been delivered to you, already?)</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnShipTofu">Ship your tofu to the retailer</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Distributor actions</h2>
+      <p>(Use input fields above to control behavior.)</p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnFetchSoy">Fetch some soy</button></p>
+                  </td>
+                  <td>
+                      <button id="btnDeliverSoy">Deliver your soy</button></p>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      <p><button id="btnFetchTofu">Fetch some tofu</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnDeliverTofu">Deliver your tofu</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Retailer actions</h2>
+      <p>(Use input fields above to control behavior.)</p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnOrderTofu">Order some new tofu</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnPutTofuOnSale">Put tofu on sale</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <hr />
+      <h2>Customer actions</h2>
+      <p>(Use input fields above to control behavior.)</p>
+      <p><button id="btnBuyTofu">Buy some tasty tofu!</button></p>
+      <p>&nbsp;</p>
+      <hr />
+      <h2>Validation fields</h2>
+      <p>Use these buttons and fields to track, i.e. get origin information on, an object based on its UPC.</p>
+      <p><label for="checkUpc">UPC to check</label><input id="checkUpc" type="text" /></p>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
+                      <p><button id="btnCheckSoy">Check soy based on UPC</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnCheckTofu">Check tofu based on UPC</button></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <br>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 20px;">
+                  <td ><b>Tofu information</b></td>
+                  <td></td>
+                  <td><b>Soy information</b></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td><label for="lblCheckUpcTofu">UPC:</label> </td>
+                  <td><label id="lblCheckUpcTofu"></label></td>
+                  <td><label for="lblCheckUpcSoy">UPC:</label></td>
+                  <td><label id="lblCheckUpcSoy"></label></td>
+              </tr>
+              <tr>
+                  <td><label for="lblNameTofu">Name:</label></td>
+                  <td><label id="lblNameTofu"></label></td>
+                  <td><label for="lblNameSoy">Name:</label></td>
+                  <td><label id="lblNameSoy"></label></td>
+              </tr>
+              <tr>
+                  <td><label for="lblProducer">Producer:</label></td>
+                  <td><label id="lblProducer"></label></td>
+                  <td><label for="lblFarmer">Farmer:</label></td>
+                  <td><label id="lblFarmer"></label></td>
+              </tr>
+              <tr>
+                  <td><label for="lblTofuDistributor">Distributor:</label></td>
+                  <td><label id="lblTofuDistributor"></label> </td>
+                  <td><label for="lblSoyDistributor">Distributor:</label></td>
+                  <td><label id="lblSoyDistributor"></label> </td>
+              </tr>
+              <tr>
+                  <td><label for="lblRetailer">Retailer:</label></td>
+                  <td><label id="lblRetailer"></label> </td>
+                  <td><label for="lblBuyer">Soy buyer:</label></td>
+                  <td><label id="lblBuyer"></label> </td>
+              </tr>
+              <tr>
+                  <td><label for="lblCustomer">Customer:</label></td>
+                  <td><label id="lblCustomer"></label> </td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td><label for="lblLatTofu">Origin Latitude:</label></td>
+                  <td> <label id="lblLatTofu"></label> </td>
+                  <td><label for="lblLatSoy">Origin Latitude:</label></td>
+                  <td> <label id="lblLatSoy"></label> </td>
+              </tr>
+              <tr>
+                  <td><label for="lblLongTofu">Origin Longitude:</label></td>
+                  <td><label id="lblLongTofu"></label></td>
+                  <td><label for="lblLongSoy">Origin Longitude:</label></td>
+                  <td><label id="lblLongSoy"></label></td>
+              </tr>
+              <tr>
+                  <td><label for="lblFromSoyUpc">Made from soy UPC:</label></td>
+                  <td> <label id="lblFromSoyUpc"></label></td>
+                  <td><label for="lblToTofuUpc">Used to make tofu UPC:</label></td>
+                  <td> <label id="lblToTofuUpc"></label></td>
+              </tr>
+          </tbody>
+      </table>
+
+      <label id="status"></label>
+
+    <script src="index.js"></script>
+  </body>
+</html>
