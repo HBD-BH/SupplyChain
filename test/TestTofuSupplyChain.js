@@ -71,17 +71,32 @@ contract('SupplyChain', (accs) => {
     retailer = accounts[4];
     customer = accounts[5];
 
-it('can plant soy', async() => {
+it('can grant roles', async() =>{
     let instance = await SupplyChain.deployed();
 
     // Grant farmer role
-    //console.log(farmer)
-    //console.log(instance.FARMER_ROLE)
-    //console.log(owner_admin)
-    let role_b = await instance.isRole("FARMER", farmer);
     await instance.addRole("FARMER", farmer, {from: owner_admin});
-    let role_a = await instance.isRole("FARMER", farmer);
-    console.log(`Role before: ${role_b}, Role after: ${role_a}`);
+    assert.equal(await instance.isRole("FARMER", farmer), true, "Did not assign farmer role properly");
+
+    // Grant tofu producer role
+    await instance.addRole("TOFUPRODUCER", tofuCompany, {from: owner_admin});
+    assert.equal(await instance.isRole("TOFUPRODUCER", tofuCompany), true, "Did not assign tofu producer role properly");
+
+    // Grant distributor role
+    await instance.addRole("DISTRIBUTOR", distributor, {from: owner_admin});
+    assert.equal(await instance.isRole("DISTRIBUTOR", distributor), true, "Did not assign distributor role properly");
+
+    // Grant retailer role
+    await instance.addRole("RETAILER", retailer, {from: owner_admin});
+    assert.equal(await instance.isRole("RETAILER", retailer), true, "Did not assign retailer role properly");
+
+    // Grant customer role
+    await instance.addRole("CUSTOMER", customer, {from: owner_admin});
+    assert.equal(await instance.isRole("CUSTOMER", customer), true, "Did not assign customer role properly");
+})
+
+it('can plant soy', async() => {
+    let instance = await SupplyChain.deployed();
 
 
     soySku = soySku + 1;
@@ -288,5 +303,30 @@ it('can buy tofu and adjusts balances correctly', async() => {
     assert.equal(myTofu[9], customer, "Could not hand over tofu to customer");
 })
 
+it('can revoke roles', async() =>{
+    let instance = await SupplyChain.deployed();
+
+    // Grant farmer role
+    await instance.removeRole("FARMER", farmer, {from: owner_admin});
+    assert.equal(await instance.isRole("FARMER", farmer), false, "Did not remove farmer role properly");
+
+    // Grant tofu producer role
+    await instance.removeRole("TOFUPRODUCER", tofuCompany, {from: owner_admin});
+    assert.equal(await instance.isRole("TOFUPRODUCER", tofuCompany), false, "Did not remove tofu producer role properly");
+
+    // Grant distributor role
+    await instance.removeRole("DISTRIBUTOR", distributor, {from: owner_admin});
+    assert.equal(await instance.isRole("DISTRIBUTOR", distributor), false, "Did not remove distributor role properly");
+
+    // Grant retailer role
+    await instance.removeRole("DISTRIBUTOR", retailer, {from: owner_admin});
+    assert.equal(await instance.isRole("DISTRIBUTOR", retailer), false, "Did not remove retailer role properly");
+
+    // Grant customer role
+    await instance.removeRole("CUSTOMER", customer, {from: owner_admin});
+    assert.equal(await instance.isRole("CUSTOMER", customer), false, "Did not remove customer role properly");
+})
+
 
 });
+

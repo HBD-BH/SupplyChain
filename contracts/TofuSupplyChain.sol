@@ -212,7 +212,7 @@ contract SupplyChain is AccessControl {
         } 
     }
 
-    function revokeRole(string memory _role, address _oldMember) public {
+    function removeRole(string memory _role, address _oldMember) public {
         if (keccak256(bytes(_role)) == keccak256("FARMER")) {
             revokeRole(FARMER_ROLE, _oldMember);
         } 
@@ -296,9 +296,11 @@ contract SupplyChain is AccessControl {
     function orderSoy(uint _upc) public payable
         // Call modifier to check if upc is for sale
         checkSoyState(_upc, soyState.Harvested)
-        // Call modifer to check if buyer has paid enough
+        // Call modifier to check if buyer has paid enough
         paidEnough(soys[_upc].price)
-        // Call modifer to send any excess ether back to buyer
+        // Call modifier to verify that sender is a tofu producer
+        onlyRole(TOFUPRODUCER_ROLE)
+        // Call modifier to send any excess ether back to buyer
         checkSoyValue(_upc) {
 
         address buyer = msg.sender;
@@ -325,6 +327,7 @@ contract SupplyChain is AccessControl {
     }
 
     function fetchSoy(uint _upc) public
+        onlyRole(DISTRIBUTOR_ROLE)
         checkSoyState(_upc, soyState.ReadyForShipping) {
 
         soys[_upc].distributor = msg.sender;
@@ -381,6 +384,7 @@ contract SupplyChain is AccessControl {
     // The retailer can order tofu using orderTofu()
     function orderTofu(uint _upc) public payable 
         checkTofuState(_upc, tofuState.Produced)
+        onlyRole(RETAILER_ROLE)
         paidEnough(tofus[_upc].price)  
         checkTofuValue(_upc) {
         
@@ -435,11 +439,9 @@ contract SupplyChain is AccessControl {
 
     // buyTofu allows to buy one unit of tofu from the retailer
     function buyTofu(uint _upc) public payable
-        // Call modifier to check if upc is for sale
         checkTofuState(_upc, tofuState.OnSale)
-        // Call modifer to check if buyer has paid enough
+        onlyRole(CUSTOMER_ROLE)
         paidEnough(tofus[_upc].price)
-        // Call modifer to send any excess ether back to buyer
         checkTofuValue(_upc) {
 
         address buyer = msg.sender;
