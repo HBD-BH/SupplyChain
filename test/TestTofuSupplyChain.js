@@ -110,7 +110,7 @@ it('can plant soy', async() => {
 })
 
 
-it ('can check soy', async() => {
+it('can check soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.checkSoy(soyUpc, {from: farmer});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
@@ -119,7 +119,7 @@ it ('can check soy', async() => {
     assert.equal(mySoy[3], soyStateEnum.Ripe, "Soy has not riped correctly");
 })
 
-it ('can harvest soy', async() => {
+it('can harvest soy', async() => {
     let instance = await SupplyChain.deployed();
     await instance.harvestSoy(soyUpc, {from: farmer});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
@@ -129,7 +129,7 @@ it ('can harvest soy', async() => {
 
 })
 
-it ('can order soy and adjusts balances correctly', async() => {
+it('can order soy and adjusts balances correctly', async() => {
     let instance = await SupplyChain.deployed();
     let balance = Web3Utils.toWei(".05", "ether");
     let balanceBuyer_before = await web3.eth.getBalance(tofuCompany);
@@ -147,7 +147,7 @@ it ('can order soy and adjusts balances correctly', async() => {
     let value = BigNumber(balanceBuyer_after).plus(gasFee).plus(BigNumber(soyPrice));
 
     assert.equal(balanceSeller_after, Number(BigNumber(balanceSeller_before).plus(BigNumber(soyPrice))), "Balance of seller did not increase correctly");
-    assert.equal(balanceBuyer_before, value, "Balance of buyer did not decrease correctly");
+    assert.equal(balanceBuyer_before, Number(value), "Balance of buyer did not decrease correctly");
 
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
@@ -222,7 +222,7 @@ it('can order tofu', async() => {
     let value = BigNumber(balanceRetailer_after).plus(gasFee).plus(BigNumber(tofuPrice));
 
     assert.equal(balanceProducer_after, Number(BigNumber(balanceProducer_before).plus(BigNumber(tofuPrice))), "Balance of producer did not increase correctly");
-    assert.equal(balanceRetailer_before, value, "Balance of retailer did not decrease correctly");
+    assert.equal(balanceRetailer_before, Number(value), "Balance of retailer did not decrease correctly");
 
     // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
     // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
@@ -293,7 +293,7 @@ it('can buy tofu and adjusts balances correctly', async() => {
     let value = BigNumber(balanceCustomer_after).plus(gasFee).plus(BigNumber(tofuRetailPrice));
 
     assert.equal(balanceRetailer_after, Number(BigNumber(balanceRetailer_before).plus(BigNumber(tofuRetailPrice))), "Balance of retailer did not increase correctly");
-    assert.equal(balanceCustomer_before, value, "Balance of customer did not decrease correctly");
+    assert.equal(balanceCustomer_before, Number(value), "Balance of customer did not decrease correctly");
 
     // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
     // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
