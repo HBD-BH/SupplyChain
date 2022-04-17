@@ -1,14 +1,11 @@
 import Web3 from "web3";
 import supplyChainArtifact from "../../build/contracts/SupplyChain.json";
 
+let currentAccount = null;
+
 const App = {
     web3: null,
-    account: null,
-    farmer: null,
-    company: null,
-    distributor: null,
-    retailer: null,
-    customer: null,
+    owner: null,
     meta: null,
 
     start: async function() {
@@ -21,22 +18,29 @@ const App = {
             this.meta = new web3.eth.Contract(
                 supplyChainArtifact.abi,
                 deployedNetwork.address,
-                {from: "0x264Ec1Dc6FaBa352A779B4D7e8fee2368e717533"}
+                {from: currentAccount}
             );
 
             // get accounts
             const accounts = await web3.eth.requestAccounts();
-            //web3.eth.requestAccounts().then(console.log).catch(console.log);
-            this.account = accounts[0];
-            this.farmer = accounts[0];
-            this.company = accounts[0];
-            this.distributor = accounts[0];
-            this.retailer = accounts[0];
-            this.customer = accounts[0];
+            currentAccount = accounts[0];
+            this.owner = this.web3.utils.toChecksumAddress(accounts[0]); // Necessary for role assignments
 
         } catch (error) {
             console.error(`Could not connect to contract or chain. Error: ${error.message}`);
         }
+    },
+
+    // Adapted from MAHENDRAN KANAGARAJ here: https://ethereum.stackexchange.com/a/102388
+    onInit: async function() {
+        await window.ethereum.enable();
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        currentAccount = accounts[0];
+        console.log(`Current account: ${currentAccount}`)
+        window.ethereum.on('accountsChanged', function (accounts) {
+            currentAccount = accounts[0];
+            console.log(`Switched account to: ${currentAccount}`)
+        });
     },
 
     setStatus: function(message) {
@@ -46,9 +50,23 @@ const App = {
 
     addRole: async function() {
         const { addRole } = this.meta.methods;
+        const { isRole } = this.meta.methods;
+        console.log(`Account: ${currentAccount}`)
         const role = document.getElementById("role").value;
-        await addRole(role, this.farmer).call();
-        App.setStatus("Added role " + role + " to address " + this.farmer + ".");
+        const roleAddress = this.web3.utils.toChecksumAddress(document.getElementById("address").value);
+        await addRole(role, roleAddress).send({from: this.owner});
+        const bSuccess = await isRole(role, roleAddress).call();
+        App.setStatus("Added role " + role + " to address " + roleAddress + ", success: " + bSuccess + ".");
+    },
+
+    removeRole: async function() {
+        const { removeRole } = this.meta.methods;
+        console.log(`Account: ${currentAccount}`)
+        const role = document.getElementById("role").value;
+        const address = document.getElementById("address").value;
+        await removeRole(role, address).send({from: this.owner});
+        //const bSuccess = await isRole(role, address).call();
+        App.setStatus("Removed role " + role + " from address " + address + ".");
     },
 
     plantSoy: async function() {
@@ -165,6 +183,7 @@ const App = {
 
     getSoy: async function() {
         const { getSoy } = this.meta.methods;
+        // console.log(`Account: ${currentAccount}`) // For debugging purposes
         const checkUpc = document.getElementById("checkUpcSoy").value;
         const soyInfo = await getSoy(checkUpc).call();
         document.getElementById("lblCheckUpcSoy").innerHTML = checkUpc;
@@ -212,5 +231,7 @@ window.addEventListener("load", async function() {
         App.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"),);
     }
 
+    App.onInit();
     App.start();
+
 });
