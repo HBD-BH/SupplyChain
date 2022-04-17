@@ -76,6 +76,7 @@
       <hr />
       <h2>Tofu producer actions</h2>
       <p>(Use input fields above to control behavior.)</p>
+      <p><label for="soyOrderEther">Ether for ordering soy (in Wei): </label><input id="soyOrderEther" type="text" /></p>
       <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
           <tbody>
               <tr style="height: 10px;">
@@ -121,6 +122,18 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
+                    <p><label for="tofuOrderEther">Ether for ordering tofu (in Wei): </label><input id="tofuOrderEther" type="text" /></p>
+                  </td>
+                  <td>
+                    <p><label for="tofuRetailPrice">Tofu retail price (in Wei): </label><input id="tofuRetailPrice" type="text" /></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
                       <p><button id="btnOrderTofu" onclick="App.orderTofu()">Order some new tofu</button></p>
                   </td>
                   <td>
@@ -132,20 +145,32 @@
       <hr />
       <h2>Customer actions</h2>
       <p>(Use input fields above to control behavior.)</p>
+      <p><label for="tofuPurchaseEther">Ether for buying tofu (in Wei): </label><input id="tofuPurchaseEther" type="text" /></p>
       <p><button id="btnBuyTofu" onclick="App.buyTofu()">Buy some tasty tofu!</button></p>
       <p>&nbsp;</p>
       <hr />
       <h2>Validation fields</h2>
       <p>Use these buttons and fields to track, i.e. get origin information on, an object based on its UPC.</p>
-      <p><label for="checkUpc">UPC to check</label><input id="checkUpc" type="text" /></p>
       <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnGetSoy" onclick="App.getSoy()">Check soy based on UPC</button></p>
+                      <p><label for="checkUpcTofu">Tofu UPC to check</label><input id="checkUpcTofu" type="text" /></p>
                   </td>
                   <td>
+                      <p><label for="checkUpcSoy">Soy UPC to check</label><input id="checkUpcSoy" type="text" /></p>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
+          <tbody>
+              <tr style="height: 10px;">
+                  <td>
                       <p><button id="btnGetTofu" onclick="App.getTofu()">Check tofu based on UPC</button></p>
+                  </td>
+                  <td>
+                      <p><button id="btnGetSoy" onclick="App.getSoy()">Check soy based on UPC</button></p>
                   </td>
               </tr>
           </tbody>
@@ -172,16 +197,22 @@
                   <td><label id="lblNameSoy"></label></td>
               </tr>
               <tr>
+                  <td><label for="lblPriceTofu">Price:</label></td>
+                  <td><label id="lblPriceTofu"></label></td>
+                  <td><label for="lblPriceSoy">Price:</label></td>
+                  <td><label id="lblPriceSoy"></label></td>
+              </tr>
+              <tr>
                   <td><label for="lblProducer">Producer:</label></td>
                   <td><label id="lblProducer"></label></td>
                   <td><label for="lblFarmer">Farmer:</label></td>
                   <td><label id="lblFarmer"></label></td>
               </tr>
               <tr>
-                  <td><label for="lblTofuDistributor">Distributor:</label></td>
-                  <td><label id="lblTofuDistributor"></label> </td>
-                  <td><label for="lblSoyDistributor">Distributor:</label></td>
-                  <td><label id="lblSoyDistributor"></label> </td>
+                  <td><label for="lblDistributorTofu">Distributor:</label></td>
+                  <td><label id="lblDistributorTofu"></label> </td>
+                  <td><label for="lblDistributorSoy">Distributor:</label></td>
+                  <td><label id="lblDistributorSoy"></label> </td>
               </tr>
               <tr>
                   <td><label for="lblRetailer">Retailer:</label></td>
@@ -206,6 +237,12 @@
                   <td><label id="lblLongTofu"></label></td>
                   <td><label for="lblLongSoy">Origin Longitude:</label></td>
                   <td><label id="lblLongSoy"></label></td>
+              </tr>
+              <tr>
+                  <td><label for="lblStateTofu">State:</label></td>
+                  <td><label id="lblStateTofu"></label></td>
+                  <td><label for="lblStateSoy">State:</label></td>
+                  <td><label id="lblStateSoy"></label></td>
               </tr>
               <tr>
                   <td><label for="lblFromSoyUpc">Made from soy UPC:</label></td>
