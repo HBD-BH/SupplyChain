@@ -39,15 +39,15 @@
       </table>
       <hr />
       <h2>Role actions</h2>
-      <p><label for="id">Role (must be FARMER, TOFUPRODUCER, RETAILER, DISTRIBUTOR, or CUSTOMER): </label><input id="id" type="text" /></p>
+      <p><label for="role">Role (must be FARMER, TOFUPRODUCER, RETAILER, DISTRIBUTOR, or CUSTOMER): </label><input id="role" type="text" /></p>
       <table style="width: 100%; border-collapse: collapse; height: 70px;" border="0">
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnAddRole">Add role</button></p>
+                      <p><button id="btnAddRole" onclick="App.addRole()">Add role</button></p>
                   </td>
                   <td>
-                      <p><button id="btnRemoveRole">Remove role</button></p>
+                      <p><button id="btnRemoveRole" onclick="App.removeRole()">Remove role</button></p>
                   </td>
               </tr>
           </tbody>
@@ -59,16 +59,16 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnPlantSoy">Plant soy</button></p>
+                      <p><button id="btnPlantSoy" onclick="App.plantSoy()">Plant soy</button></p>
                   </td>
                   <td>
-                      <p><button id="btnCheckSoy">Check your soy, maybe it's ready for harvesting?</button></p>
+                      <p><button id="btnCheckSoy" onclick="App.checkSoy()">Check your soy, maybe it's ready for harvesting?</button></p>
                   </td>
                   <td>
-                      <p><button id="btnHarvestSoy">Harvest your soy once it's ripe!</button></p>
+                      <p><button id="btnHarvestSoy" onclick="App.harvestSoy()">Harvest your soy once it's ripe!</button></p>
                   </td>
                   <td>
-                      <p><button id="btnShipSoy">Ship your soy to the tofu producer once it's ordered</button></p>
+                      <p><button id="btnShipSoy" onclick="App.shipSoy()">Ship your soy to the tofu producer once it's ordered</button></p>
                   </td>
               </tr>
           </tbody>
@@ -80,13 +80,13 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnOrderSoy">Order new soy</button></p>
+                      <p><button id="btnOrderSoy" onclick="App.orderSoy()">Order new soy</button></p>
                   </td>
                   <td>
-                      <p><button id="btnMakeTofu">Make tofu (has your soy been delivered to you, already?)</button></p>
+                      <p><button id="btnMakeTofu" onclick="App.makeTofu()">Make tofu (has your soy been delivered to you, already?)</button></p>
                   </td>
                   <td>
-                      <p><button id="btnShipTofu">Ship your tofu to the retailer</button></p>
+                      <p><button id="btnShipTofu" onclick="App.shipTofu()">Ship your tofu to the retailer</button></p>
                   </td>
               </tr>
           </tbody>
@@ -98,18 +98,18 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnFetchSoy">Fetch some soy</button></p>
+                      <p><button id="btnFetchSoy" onclick="App.fetchSoy()">Fetch some soy</button></p>
                   </td>
                   <td>
-                      <button id="btnDeliverSoy">Deliver your soy</button></p>
+                      <button id="btnDeliverSoy" onclick="App.deliverSoy()">Deliver your soy</button></p>
                   </td>
               </tr>
               <tr>
                   <td>
-                      <p><button id="btnFetchTofu">Fetch some tofu</button></p>
+                      <p><button id="btnFetchTofu" onclick="App.fetchTofu()">Fetch some tofu</button></p>
                   </td>
                   <td>
-                      <p><button id="btnDeliverTofu">Deliver your tofu</button></p>
+                      <p><button id="btnDeliverTofu" onclick="App.deliverTofu()">Deliver your tofu</button></p>
                   </td>
               </tr>
           </tbody>
@@ -121,10 +121,10 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnOrderTofu">Order some new tofu</button></p>
+                      <p><button id="btnOrderTofu" onclick="App.orderTofu()">Order some new tofu</button></p>
                   </td>
                   <td>
-                      <p><button id="btnPutTofuOnSale">Put tofu on sale</button></p>
+                      <p><button id="btnPutTofuOnSale" onclick="App.putTofuOnSale()">Put tofu on sale</button></p>
                   </td>
               </tr>
           </tbody>
@@ -132,7 +132,7 @@
       <hr />
       <h2>Customer actions</h2>
       <p>(Use input fields above to control behavior.)</p>
-      <p><button id="btnBuyTofu">Buy some tasty tofu!</button></p>
+      <p><button id="btnBuyTofu" onclick="App.buyTofu()">Buy some tasty tofu!</button></p>
       <p>&nbsp;</p>
       <hr />
       <h2>Validation fields</h2>
@@ -142,10 +142,10 @@
           <tbody>
               <tr style="height: 10px;">
                   <td>
-                      <p><button id="btnCheckSoy">Check soy based on UPC</button></p>
+                      <p><button id="btnGetSoy" onclick="App.getSoy()">Check soy based on UPC</button></p>
                   </td>
                   <td>
-                      <p><button id="btnCheckTofu">Check tofu based on UPC</button></p>
+                      <p><button id="btnGetTofu" onclick="App.getTofu()">Check tofu based on UPC</button></p>
                   </td>
               </tr>
           </tbody>
@@ -216,7 +216,7 @@
           </tbody>
       </table>
 
-      <label id="status"></label>
+      <label id="status">Here's a status</label>
 
     <script src="index.js"></script>
   </body>
