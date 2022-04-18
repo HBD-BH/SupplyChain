@@ -2,9 +2,10 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 // Define the contract 'SupplyChain'
-contract SupplyChain is AccessControl {
+contract SupplyChain is AccessControl, Ownable {
     // Holds all functions and structs
 
     //address owner;
