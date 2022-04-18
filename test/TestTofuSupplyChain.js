@@ -1,7 +1,7 @@
 const SupplyChain = artifacts.require("SupplyChain");
 const BigNumber = require('bignumber.js');
 const Web3Utils = require('web3-utils');
-
+const truffleAssert = require('truffle-assertions')
 
 let accounts;
 let owner_admin;
@@ -121,11 +121,13 @@ it('can check soy', async() => {
 
 it('can harvest soy', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.harvestSoy(soyUpc, {from: farmer});
+    let result = await instance.harvestSoy(soyUpc, {from: farmer});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy[3], soyStateEnum.Harvested, "Could not harvest soy");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(result, 'Harvested');
 
 })
 
@@ -154,15 +156,20 @@ it('can order soy and adjusts balances correctly', async() => {
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy[3], soyStateEnum.Ordered, "Could not order soy");
     assert.equal(mySoy[8], tofuCompany, "Soy buyer not assigned properly");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'Sold');
+
 })
 
 it('can ship soy', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.shipSoy(soyUpc, {from: farmer});
+    let receipt = await instance.shipSoy(soyUpc, {from: farmer});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy[3], soyStateEnum.ReadyForShipping, "Could not ship soy");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'ReadyForShipping');
 })
 
 it('can fetch soy', async() => {
@@ -177,16 +184,18 @@ it('can fetch soy', async() => {
 
 it('can deliver soy', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.deliverSoy(soyUpc, {from: distributor});
+    let receipt = await instance.deliverSoy(soyUpc, {from: distributor});
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
     let mySoy = await instance.getSoy.call(soyUpc);
     assert.equal(mySoy[3], soyStateEnum.Delivered, "Could not deliver soy");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'Delivered');
 })
 
 it('can make tofu', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
+    let receipt = await instance.makeTofu(tofuName, soyUpc, tofuUpc, tofuPrice, tofuLat, tofuLong, {from: tofuCompany});
 
     // getSoy returns  0     1    2      3      4       5          6           7            8      9
     // getSoy returns (name, sku, price, state, farmer, originLat, originLong, distributor, buyer, toTofuUpc)
@@ -201,6 +210,8 @@ it('can make tofu', async() => {
     assert.equal(myTofu[0], tofuName, "Could not add tofu name");
     assert.equal(myTofu[4], tofuCompany, "Could not add tofu producer");
     assert.equal(myTofu[10], soyUpc, "Could not link tofu to original soy upc");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'Produced');
 })
 
 it('can order tofu', async() => {
@@ -233,12 +244,14 @@ it('can order tofu', async() => {
 
 it('can ship tofu', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.shipTofu(tofuUpc, {from: tofuCompany});
+    let receipt = await instance.shipTofu(tofuUpc, {from: tofuCompany});
 
     // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
     // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu[3], tofuStateEnum.ReadyForShipping, "Could not ship tofu");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'ReadyForShipping');
 })
 
 // Testing two functionalities in one test in order to reduce complexity
@@ -252,23 +265,27 @@ it('can fetch and deliver tofu', async() => {
     assert.equal(myTofu[3], tofuStateEnum.Shipping, "Could not fetch tofu");
     assert.equal(myTofu[7], distributor, "Could not assign distributor correctly");
 
-    await instance.deliverTofu(tofuUpc, {from: distributor});
+    let receipt = await instance.deliverTofu(tofuUpc, {from: distributor});
 
     // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
     // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu2 = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu2.state, tofuStateEnum.Delivered, "Could not deliver tofu");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'Delivered');
 })
 
 it('can put tofu on sale', async() => {
     let instance = await SupplyChain.deployed();
-    await instance.putTofuOnSale(tofuUpc, tofuRetailPrice, {from:retailer});
+    let receipt = await instance.putTofuOnSale(tofuUpc, tofuRetailPrice, {from:retailer});
 
     // getTofu returns  0     1    2      3      4         5               6                7            8         9      10
     // getTofu returns (name, sku, price, state, producer, originLatitude, originLongitude, distributor, retailer, buyer, fromSoyUpc)
     let myTofu = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu[3], tofuStateEnum.OnSale, "Could not put tofu on sale");
     assert.equal(myTofu[2], tofuRetailPrice, "Could not assign retail price to tofu");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'OnSale');
 })
 
 
@@ -300,6 +317,8 @@ it('can buy tofu and adjusts balances correctly', async() => {
     let myTofu = await instance.getTofu.call(tofuUpc);
     assert.equal(myTofu[3], tofuStateEnum.Sold, "Could not sell tofu");
     assert.equal(myTofu[9], customer, "Could not hand over tofu to customer");
+    // Check for appropriate event emitted
+    truffleAssert.eventEmitted(receipt, 'Sold');
 })
 
 it('can revoke roles', async() =>{
